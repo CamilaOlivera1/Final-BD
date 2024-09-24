@@ -76,39 +76,4 @@ public class GeneroController {
         return ResponseEntity.ok(generoOptional.get());
     }
 
-    @PostMapping("/{generoId}/cantantes/{cantanteId}")
-    public ResponseEntity<Genero> agregarCantanteAGenero(@PathVariable Integer generoId, @PathVariable Integer cantanteId) {
-        Optional<Genero> generoOptional = generoRepository.findById(generoId);
-        Optional<Cantante> cantanteOptional = cantanteRepository.findById(cantanteId);
-
-        if (!generoOptional.isPresent() || !cantanteOptional.isPresent()) {
-            return ResponseEntity.unprocessableEntity().build();
-        }
-
-        Genero genero = generoOptional.get();
-        Cantante cantante = cantanteOptional.get();
-
-        genero.getCantantes().add(cantante);
-        generoRepository.save(genero);
-
-        return ResponseEntity.ok(genero);
-    }
-
-    @DeleteMapping("/{generoId}/cantantes/{cantanteId}")
-    public ResponseEntity<Genero> eliminarCantanteDeGenero(@PathVariable Integer generoId, @PathVariable Integer cantanteId) {
-        Optional<Genero> generoOptional = generoRepository.findById(generoId);
-        Optional<Cantante> cantanteOptional = cantanteRepository.findById(cantanteId);
-
-        if (!generoOptional.isPresent() || !cantanteOptional.isPresent()) {
-            return ResponseEntity.unprocessableEntity().build();
-        }
-
-        Genero genero = generoOptional.get();
-        Cantante cantante = cantanteOptional.get();
-
-        genero.getCantantes().remove(cantante);
-        generoRepository.save(genero);
-
-        return ResponseEntity.ok(genero);
-    }
 }

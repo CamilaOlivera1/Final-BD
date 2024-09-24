@@ -79,48 +79,13 @@ public class CantanteController {
                 .orElseGet(() -> ResponseEntity.unprocessableEntity().build());
     }
 
-    @GetMapping("/{cantanteId}/albumes")
+    @GetMapping("/{cantanteId}/albums")
     public ResponseEntity<Set<Album>> obtenerAlbumesDeCantante(@PathVariable Integer cantanteId) {
         return cantanteRepository.findById(cantanteId)
                 .map(cantante -> ResponseEntity.ok(cantante.getAlbums()))
                 .orElseGet(() -> ResponseEntity.unprocessableEntity().build());
     }
 
-    @PostMapping("/{cantanteId}/albumes/{albumId}")
-    public ResponseEntity<Void> asignarAlbumACantante(@PathVariable Integer cantanteId, @PathVariable Integer albumId) {
-        Optional<Cantante> cantanteOptional = cantanteRepository.findById(cantanteId);
-        Optional<Album> albumOptional = albumRepository.findById(albumId);
-
-        if (cantanteOptional.isEmpty() || albumOptional.isEmpty()) {
-            return ResponseEntity.unprocessableEntity().build();
-        }
-
-        Cantante cantante = cantanteOptional.get();
-        Album album = albumOptional.get();
-
-        cantante.getAlbums().add(album);
-        cantanteRepository.save(cantante);
-
-        return ResponseEntity.noContent().build();
-    }
-
-    @DeleteMapping("/{cantanteId}/albumes/{albumId}")
-    public ResponseEntity<Void> removerAlbumDeCantante(@PathVariable Integer cantanteId, @PathVariable Integer albumId) {
-        Optional<Cantante> cantanteOptional = cantanteRepository.findById(cantanteId);
-        Optional<Album> albumOptional = albumRepository.findById(albumId);
-
-        if (cantanteOptional.isEmpty() || albumOptional.isEmpty()) {
-            return ResponseEntity.unprocessableEntity().build();
-        }
-
-        Cantante cantante = cantanteOptional.get();
-        Album album = albumOptional.get();
-
-        cantante.getAlbums().remove(album);
-        cantanteRepository.save(cantante);
-
-        return ResponseEntity.noContent().build();
-    }
 
     @GetMapping("/{cantanteId}/generos")
     public ResponseEntity<Set<Genero>> obtenerGenerosDeCantante(@PathVariable Integer cantanteId) {
@@ -165,9 +130,9 @@ public class CantanteController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{id}/perfil")
-    public ResponseEntity<Perfil> obtenerPerfilDeCantante(@PathVariable Integer id) {
-        return cantanteRepository.findById(id)
+    @GetMapping("/{cantanteId}/perfil")
+    public ResponseEntity<Perfil> obtenerPerfilDeCantante(@PathVariable Integer cantanteId) {
+        return cantanteRepository.findById(cantanteId)
                 .map(cantante -> ResponseEntity.ok(cantante.getPerfil()))
                 .orElseGet(() -> ResponseEntity.unprocessableEntity().build());
     }

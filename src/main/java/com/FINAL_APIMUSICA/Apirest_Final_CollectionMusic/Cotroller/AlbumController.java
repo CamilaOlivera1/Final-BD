@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -62,20 +63,31 @@ public class AlbumController {
                 .orElseGet(() -> ResponseEntity.unprocessableEntity().build());
     }
 
-
     @PutMapping("/{id}")
-    public ResponseEntity<Album> actualizarAlbum(@PathVariable Integer id, @RequestBody Album album) {
-        if (!albumRepository.existsById(id)) {
+    public ResponseEntity<Album> actualizarAlbum(@PathVariable Integer id, @Validated @RequestBody Album album) {
+        Optional<Album> albumExistenteOptional = albumRepository.findById(id);
+
+        if (albumExistenteOptional.isEmpty()) {
             return ResponseEntity.unprocessableEntity().build();
         }
 
-        // Mantener el ID del álbum actual y el cantante asociado
-        album.setId(id);
-        Album albumActualizado = albumRepository.save(album);
+        Album albumExistente = albumExistenteOptional.get();
 
-        return ResponseEntity.ok(albumActualizado);
+        albumExistente.setTitulo(album.getTitulo());
+        albumExistente.setFechaLanzamiento(album.getFechaLanzamiento());
+
+        if (album.getCantante() != null && album.getCantante().getId() != null) {
+            Optional<Cantante> cantanteOptional = cantanteRepository.findById(album.getCantante().getId());
+            if (cantanteOptional.isPresent()) {
+                albumExistente.setCantante(cantanteOptional.get());
+            }
+        }
+
+        // Guardar los cambios
+        albumRepository.save(albumExistente);
+
+        return ResponseEntity.ok(albumExistente);
     }
-
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarAlbum(@PathVariable Integer id) {
@@ -116,9 +128,6 @@ public class AlbumController {
 
         return ResponseEntity.noContent().build();
     }
-
-
-
     @DeleteMapping("/{albumId}/canciones/{cancionId}")
     public ResponseEntity<Void> eliminarCancionDeAlbum(@PathVariable Integer albumId, @PathVariable Integer cancionId) {
         Optional<Album> albumOptional = albumRepository.findById(albumId);
